@@ -1,10 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import Stack
-from pydantic import BaseModel
 import threading
 import json
 import time
+from pydantic import BaseModel
+from Stack import Stack
 
 app = FastAPI()
 stack = Stack()
@@ -30,12 +30,15 @@ def sensor_data():
         # stack.get_bme_data() returns all the BME280 data
         retv = json.dumps({'current':stack.get_current_sensor_data()})
         time.sleep(1)
-        return {"success": True,'sensordata': retv}
-        
+        print({"success": True,'sensordata': retv})
+
+sensor_thread = threading.Thread(target=sensor_data)
+sensor_thread.daemon = True
+sensor_thread.start()
+
 @app.get("/")
 def read_root():
     return {"message": "Hello, World"}
-
 
 @app.post("/led_toggle")
 def handle_led_toggle(data: LEDToggle):
@@ -55,5 +58,3 @@ def get_sensor_data():
     # stack.get_bme_data() returns all the BME280 data
     retv = json.dumps({'current':stack.get_current_sensor_data()})
     return {"success": True,'sensordata': retv}
-
- 
