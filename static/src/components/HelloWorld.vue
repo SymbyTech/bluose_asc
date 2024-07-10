@@ -202,7 +202,28 @@ export default {
         console.error('Error toggling LED:', error);
       }
     },
+    async fetchSensorData() {
+      try {
+        const response = await axios.get('http://127.0.0.1:8000/sensor_data');
+        const data = response.data.sensordata;
+        const parsedData = JSON.parse(data);
+
+        // Assuming the sensor data structure has 'current' key with an array of values
+        parsedData.current.forEach((sensor, index) => {
+          document.getElementById(`v${index + 1}`).innerText = sensor.voltage;
+          document.getElementById(`c${index + 1}`).innerText = sensor.current;
+          document.getElementById(`t${index + 1}`).innerText = sensor.watt;
+        });
+
+      } catch (error) {
+        console.error('Error fetching sensor data:', error);
+      }
+    }
   },
+  mounted() {
+    this.fetchSensorData();
+    setInterval(this.fetchSensorData, 1000); // Fetch data every second
+  }
 };
 </script>
 
@@ -216,69 +237,3 @@ export default {
   text-align: center;
 }
 
-.chart-container {
-  margin-top: 20px;
-}
-
-table {
-  width: 100%;
-  margin-top: 20px;
-  border-collapse: collapse;
-}
-
-td {
-  padding: 10px;
-  border: 1px solid #ccc;
-}
-
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 34px;
-  height: 20px;
-}
-
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  transition: 0.4s;
-}
-
-.slider:before {
-  position: absolute;
-  content: '';
-  height: 14px;
-  width: 14px;
-  left: 3px;
-  bottom: 3px;
-  background-color: white;
-  transition: 0.4s;
-}
-
-input:checked + .slider {
-  background-color: #2196f3;
-}
-
-input:checked + .slider:before {
-  transform: translateX(14px);
-}
-
-.slider.round {
-  border-radius: 34px;
-}
-
-.slider.round:before {
-  border-radius: 50%;
-}
-</style>
