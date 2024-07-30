@@ -192,28 +192,100 @@ export default {
   methods: {
     async toggle(channel, board, id) {
       const state = document.getElementById(`toggle-${id}-${channel}`).checked ? 1 : 0;
-      try {
-        const response = await axios.post('http://127.0.0.1:8000/led_toggle', {
-          led_channel: channel,
+      if(board === 0){
+        try {
+        const response = await axios.post('http://192.168.1.44:9009/cam_toggle', {
+          cam_num: channel,
+          state: state,
+        });
+        console.log(response.data);
+      } catch (error) {
+        console.error('Error toggling Camera:', error);
+      }
+      }else if ( board === 1){
+        try {
+        const response = await axios.post('http://192.168.1.44:9009/led_toggle', {
+          led_num: channel,
           state: state,
         });
         console.log(response.data);
       } catch (error) {
         console.error('Error toggling LED:', error);
       }
+      }else{
+        try {
+        const response = await axios.post('http://192.168.1.44:9009/motor_toggle', {
+          motor_num: channel,
+          state: state,
+        });
+        console.log(response.data);
+      } catch (error) {
+        console.error('Error toggling Motor:', error);
+      }
+      }
+      
     },
     async fetchSensorData() {
       try {
-        const response = await axios.get('http://127.0.0.1:8000/sensor_data');
+        const response = await axios.get('http://192.168.1.44:9009/sensor_data');
         const data = response.data.sensordata;
-        const parsedData = JSON.parse(data);
+        const msg = JSON.parse(data);
+       // console.log(msg.current);
+
+         document.getElementById("v1").innerHTML = msg.current["0"]["1"]["volt"].toFixed(2);
+    document.getElementById("c1").innerHTML = msg.current["0"]["1"]["current"].toFixed(2);
+    document.getElementById("t1").innerHTML = msg.current["0"]["1"]["watt"].toFixed(2);
+
+    document.getElementById("v2").innerHTML = msg.current["0"]["2"]["volt"].toFixed(2);
+    document.getElementById("c2").innerHTML = msg.current["0"]["2"]["current"].toFixed(2);
+    document.getElementById("t2").innerHTML = msg.current["0"]["2"]["watt"].toFixed(2);
+
+    document.getElementById("v3").innerHTML = msg.current["0"]["3"]["volt"].toFixed(2);
+    document.getElementById("c3").innerHTML = msg.current["0"]["3"]["current"].toFixed(2);
+    document.getElementById("t3").innerHTML = msg.current["0"]["3"]["watt"].toFixed(2);
+
+    document.getElementById("v4").innerHTML = msg.current["0"]["4"]["volt"].toFixed(2);
+    document.getElementById("c4").innerHTML = msg.current["0"]["4"]["current"].toFixed(2);
+    document.getElementById("t4").innerHTML = msg.current["0"]["4"]["watt"].toFixed(2);
+   
+    document.getElementById("v11-0-1").innerHTML = msg.current["1"]["1"]["volt"].toFixed(2);
+    document.getElementById("c11-0-1").innerHTML = msg.current["1"]["1"]["current"].toFixed(2);
+    document.getElementById("t11-0-1").innerHTML = msg.current["1"]["1"]["watt"].toFixed(2);
+
+    document.getElementById("v12-0-1").innerHTML = msg.current["1"]["2"]["volt"].toFixed(2);
+    document.getElementById("c12-0-1").innerHTML = msg.current["1"]["2"]["current"].toFixed(2);
+    document.getElementById("t12-0-1").innerHTML = msg.current["1"]["2"]["watt"].toFixed(2);
+
+    document.getElementById("v13-0-1").innerHTML = msg.current["1"]["3"]["volt"].toFixed(2);
+    document.getElementById("c13-0-1").innerHTML = msg.current["1"]["3"]["current"].toFixed(2);
+    document.getElementById("t13-0-1").innerHTML = msg.current["1"]["3"]["watt"].toFixed(2);
+
+    document.getElementById("v14-0-1").innerHTML = msg.current["1"]["4"]["volt"].toFixed(2);
+    document.getElementById("c14-0-1").innerHTML = msg.current["1"]["4"]["current"].toFixed(2);
+    document.getElementById("t14-0-1").innerHTML = msg.current["1"]["4"]["watt"].toFixed(2);
+
+    document.getElementById("v111").innerHTML = msg.current["2"]["1"]["volt"].toFixed(2);
+    document.getElementById("c111").innerHTML = msg.current["2"]["1"]["current"].toFixed(2);
+    document.getElementById("t111").innerHTML = msg.current["2"]["1"]["watt"].toFixed(2);
+
+    document.getElementById("v122").innerHTML = msg.current["2"]["2"]["volt"].toFixed(2);
+    document.getElementById("c122").innerHTML = msg.current["2"]["2"]["current"].toFixed(2);
+    document.getElementById("t122").innerHTML = msg.current["2"]["2"]["watt"].toFixed(2);
+
+    document.getElementById("v133").innerHTML = msg.current["2"]["3"]["volt"].toFixed(2);
+    document.getElementById("c133").innerHTML = msg.current["2"]["3"]["current"].toFixed(2);
+    document.getElementById("t133").innerHTML = msg.current["2"]["3"]["watt"].toFixed(2);
+
+    document.getElementById("v144").innerHTML = msg.current["2"]["4"]["volt"].toFixed(2);
+    document.getElementById("c144").innerHTML = msg.current["2"]["4"]["current"].toFixed(2);
+    document.getElementById("t144").innerHTML = msg.current["2"]["4"]["watt"].toFixed(2);
 
         // Assuming the sensor data structure has 'current' key with an array of values
-        parsedData.current.forEach((sensor, index) => {
-          document.getElementById(`v${index + 1}`).innerText = sensor.voltage;
-          document.getElementById(`c${index + 1}`).innerText = sensor.current;
-          document.getElementById(`t${index + 1}`).innerText = sensor.watt;
-        });
+       // parsedData.current.forEach((sensor, index) => {
+         // document.getElementById(`v${index + 1}`).innerText = sensor.voltage;
+          //document.getElementById(`c${index + 1}`).innerText = sensor.current;
+          //document.getElementById(`t${index + 1}`).innerText = sensor.watt;
+       // });
 
       } catch (error) {
         console.error('Error fetching sensor data:', error);
@@ -236,5 +308,65 @@ export default {
 .hero {
   text-align: center;
 }
+
+/* Style for the switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 10px;
+}
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 10px;
+  width: 16px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #f32121;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #f32121;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+  
 
 </style>
